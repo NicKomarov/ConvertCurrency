@@ -45,25 +45,56 @@ class Program
         {
             try
             {
-                Console.Write("Введіть курс для долара: ");
+                Console.Write("Введіть курс для долара(decimal): ");
                 decimal doll = Convert.ToDecimal(Console.ReadLine());
-                Console.Write("Введіть курс для євро: ");
+                Console.Write("Введіть курс для євро(decimal): ");
                 decimal eu = Convert.ToDecimal(Console.ReadLine());
+
                 Converter converter = new Converter { Dollar = doll, Euro = eu};
+
+                Console.Write("Введіть валюту з якої переводити(g - гривня, d - долар, e - євро): ");
+                string from = Console.ReadLine();
+                Console.Write("Введіть валюту в яку переводити(g - гривня, d - долар, e - євро): ");
+                string to = Console.ReadLine();
+                if (from != "g" && from != "e" && from != "d" || to != "g" && to != "e" && to != "d")
+                {
+                    throw new FormatException();
+                }
+                Console.Write("Введіть суму(decimal): ");
+                decimal sum = Convert.ToDecimal(Console.ReadLine());
+                if (sum < 0)    throw new ArgumentException("Сума не може бути від'ємною");
+
+                decimal result;
+                if (from == to) result = sum;
+                else if (from == "g")
+                {
+                    if (to == "e") result = sum / converter.euro;
+                    else result = sum / converter.dollar;
+                }
+                else if (from == "e")
+                {
+                    result = sum * converter.euro;
+                }
+                else result = sum * converter.dollar;
+                Console.WriteLine(result);
+
                 incorrect_input = false;
             }
             catch(ConverterException ex)
             {
                 Console.WriteLine($"Помилка: {ex.Message}");
             }
-            catch(FormatException)
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (FormatException)
             {
                 Console.WriteLine("Не коректне введення! Спробуй ще раз");
             }
         }
         while (incorrect_input);
 
-
-        Console.WriteLine("Ok");
+        Console.ReadKey();
     }
 }
